@@ -45,37 +45,37 @@ inquirer
       console.log(
         "\u001b[32m \n Please find below the list of all Departments"
       );
-      db.query(
-        "select department as department_name, id as department_id from department",
-        function (err, results) {
-          console.table("\u001b[34m", results);
-        }
-      );
+      db.promise().query(
+        "select department as department_name, id as department_id from department"
+      ).then((results)=> {
+        console.table("\u001b[34m", results[0]);
+      });
     }
     // To view all roles
     if (querySelection.querySelect == "View All Roles") {
       console.log("\u001b[32m \n Please find below the list of existing roles");
-      db.query(
+      db.promise().query(
         "select title as job_title, r.id as role_id,d.department as department_name, salary \n" +
           "from role r inner join department d \n" +
           "on d.id = r.department_id",
-        function (err, results) {
-          console.table("\u001b[34m", results);
-        }
-      );
+          ).then((results)=> {
+            console.table("\u001b[34m", results[0]);
+        });
     }
     //To view all employees
     if (querySelection.querySelect == "View All Employees") {
       console.log("\u001b[32m \n Please find below the list of all employees");
-      db.query(
+      db.promise().query(
         " select e.id as employee_id, e.first_name, e.last_name,title as job_title, \n" +
           "d.department, r.salary, concat(m.first_name, ' ', m.last_name) as manager \n" +
           "from employee e \n" +
           "left join role r on r.id = e.role_id \n" +
           "left join department d on r.department_id = d.id \n" +
           "left join manager m on m.employee_id = e.id",
-        function (err, results) {
-          console.table("\u001b[34m", results);
+        //function (err, results) {
+          //console.table("\u001b[34m", results);
+          ).then((results)=> {
+            console.table("\u001b[34m", results[0]);
         }
       );
     }
@@ -98,10 +98,12 @@ inquirer
               console.log(
                 `\u001b[32m \n Added new Department : ${answer.addDepartment} \n New Department table :`
               );
-              db.query(
+              db.promise().query(
                 "select department as department_name, id as department_id from department",
-                function (err, results) {
-                  console.table("\u001b[34m", results);
+                //function (err, results) {
+                  //console.table("\u001b[34m", results);
+                  ).then((results)=> {
+                    console.table("\u001b[34m", results[0]);
                 }
               );
             }
@@ -332,7 +334,7 @@ inquirer
     }
     //Bonus point requirement -- budget per department
     if (querySelection.querySelect == "total utilized budget of a department") {
-        db.query('with salary as (	\n' +
+        db.promise().query('with salary as (	\n' +
             'select (count(distinct e.id) * salary) as sal , department \n' +
             'from role r \n' +
             'inner join department d on r.department_id=d.id \n' +
@@ -340,8 +342,11 @@ inquirer
             'group by salary, department) \n' +
             'select 	sum(sal) as Salary, department from salary \n' +
             'group by department;',
-            function (err, results) {
-              console.table("\u001b[34m", results);})
+            //function (err, results) {
+              //console.table("\u001b[34m", results);
+              ).then((results)=> {
+                console.table("\u001b[34m", results[0]);
+            })
 
     }
   });
